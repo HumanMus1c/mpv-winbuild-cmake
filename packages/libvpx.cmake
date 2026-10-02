@@ -1,5 +1,5 @@
 ExternalProject_Add(libvpx
-    GIT_REPOSITORY https://chromium.googlesource.com/webm/libvpx.git
+    GIT_REPOSITORY https://github.com/webmproject/libvpx.git
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--filter=tree:0"
     GIT_REMOTE_NAME origin
