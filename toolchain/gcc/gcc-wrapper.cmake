@@ -1,4 +1,6 @@
 ExternalProject_Add(gcc-wrapper
+    DEPENDS
+        gcc-binutils
     DOWNLOAD_COMMAND ""
     SOURCE_DIR ${SOURCE_LOCATION}
     UPDATE_COMMAND ""
