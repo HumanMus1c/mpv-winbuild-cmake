@@ -25,8 +25,8 @@ ExternalProject_Add(mpv
         subrandr
         libsixel
         curl
-    GIT_REPOSITORY D:/Documents/GitHub/mpv
-    GIT_TAG diag/demux-thread-handshake
+    GIT_REPOSITORY ${MPV_REPO}
+    GIT_TAG ${MPV_REF}
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--filter=tree:0"
     UPDATE_COMMAND ""
