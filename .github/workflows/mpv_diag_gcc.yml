@@ -1,0 +1,138 @@
+name: mpv gcc diag
+
+defaults:
+  run:
+    shell: bash
+
+on:
+  workflow_dispatch:
+    inputs:
+      mpv_ref:
+        description: 'mpv branch or tag to build (from HumanMus1c/mpv)'
+        required: false
+        default: 'diag/demux-thread-handshake'
+        type: string
+      mpv_repo:
+        description: 'mpv git repository URL'
+        required: false
+        default: 'https://github.com/HumanMus1c/mpv.git'
+        type: string
+
+concurrency:
+  group: mpv-gcc-diag-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build_mpv:
+    name: Building mpv
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        bit: [x86_64_v3]
+    env:
+      BIT: ${{ matrix.bit }}
+    container:
+      image: docker://ghcr.io/shinchiro/archlinux:latest
+    steps:
+      - name: Init variable
+        run: |
+          if [[ $BIT == "x86_64_v3" ]]; then
+            echo "arch=x86_64" >> $GITHUB_ENV
+            echo "gcc_arch=-DGCC_ARCH=x86-64-v3" >> $GITHUB_ENV
+            echo "x86_64_level=-v3" >> $GITHUB_ENV
+          fi
+
+      - name: Setup git config
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global pull.rebase true
+          git config --global rebase.autoStash true
+          git config --global fetch.prune true
+          git config --global --add safe.directory $PWD
+
+      - uses: actions/checkout@main
+
+      - name: Loading ${{ matrix.bit }} toolchain cache
+        uses: actions/cache/restore@main
+        with:
+          path: build_${{ matrix.bit }}
+          key: diag-v1-gcc-${{ matrix.bit }}_toolchain-${{ github.run_id }}
+          restore-keys: |
+            diag-v1-gcc-${{ matrix.bit }}_toolchain
+
+      - name: Loading repository cache
+        uses: actions/cache/restore@main
+        with:
+          path: src_packages
+          key: diag-v1-repository-${{ github.run_id }}
+          restore-keys: |
+            diag-v1-repository
+
+      - name: Loading rustup cache
+        uses: actions/cache/restore@main
+        with:
+          path: |
+            clang_root
+          key: diag-v1-clang_root-${{ github.run_id }}
+          restore-keys: |
+            diag-v1-clang_root
+
+      - name: Downloading source
+        run: |
+          cmake -DTARGET_ARCH=${{ env.arch }}-w64-mingw32 ${{ env.gcc_arch }} -DSINGLE_SOURCE_LOCATION=$PWD/src_packages -DRUSTUP_LOCATION=$PWD/clang_root/install_rustup -DENABLE_CCACHE=ON -DMPV_REPO=${{ github.event.inputs.mpv_repo }} -DMPV_REF=${{ github.event.inputs.mpv_ref }} --fresh -G Ninja -B build_$BIT -S $PWD
+          ninja -C build_$BIT download || true
+
+      - name: Building toolchain
+        run: |
+          if [[ ! -f "build_$BIT/install/bin/cross-gcc" ]]; then ninja -C build_$BIT gcc && rm -rf build_$BIT/toolchain; fi
+
+      - name: Building mpv
+        run: |
+          ninja -C build_$BIT update
+          ninja -C build_$BIT mpv
+
+      - name: Packaging mpv
+        run: |
+          mkdir -p release_$BIT
+          rm -rf build_$BIT/mpv-debug*; ninja -C build_$BIT mpv-packaging; mv build_$BIT/mpv*.7z release_$BIT
+
+      - name: Collecting logs
+        if: always()
+        run: |
+          mkdir -p build_${BIT}_logs
+          cp -fr $(find build_$BIT -type f -iname "*-*.log" -or -wholename "*/ffbuild/config.log") build_${BIT}_logs || true
+          7z a -m0=lzma2 -mx=9 -ms=on logs.7z build*logs
+
+      - name: Uploading logs
+        uses: actions/upload-artifact@main
+        if: always()
+        with:
+          name: mpv-${{ matrix.bit }}-logs
+          path: logs.7z
+          retention-days: 7
+
+      - name: Uploading ${{ matrix.bit }} build
+        uses: actions/upload-artifact@main
+        with:
+          name: mpv-${{ matrix.bit }}
+          path: release_${{ matrix.bit }}/mpv-*
+          retention-days: 7
+
+      - name: Cleaning build directory
+        if: always()
+        run: |
+          rm -rf build_$BIT/mpv*
+
+      - name: Cleaning rust toolchain directory
+        if: always()
+        run: |
+          ninja -C build_$BIT cargo-clean
+
+      - name: Saving ${{ matrix.bit }} toolchain cache
+        uses: actions/cache/save@main
+        if: always()
+        with:
+          path: build_${{ matrix.bit }}
+          key: diag-v1-gcc-${{ matrix.bit }}_toolchain-${{ github.run_id }}
