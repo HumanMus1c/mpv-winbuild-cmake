@@ -1,0 +1,30 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: MoePlayer build <build@localhost>
+Date: Fri, 3 Oct 2026 19:00:00 +0800
+Subject: [PATCH] libsvtav1: adapt to the aq_mode rename in SVT-AV1 4
+
+enable_adaptive_quantization was removed from EbSvtAv1EncConfiguration
+in SVT-AV1 v4; the equivalent CQP-mode knob is now aq_mode.
+---
+ libavcodec/libsvtav1.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/libavcodec/libsvtav1.c
++++ b/libavcodec/libsvtav1.c
+@@ -233,11 +233,11 @@
+             FFMAX(avctx->bit_rate, avctx->rc_max_rate);
+
+     if (svt_enc->crf > 0) {
+         param->qp                   = svt_enc->crf;
+         param->rate_control_mode    = 0;
+     } else if (svt_enc->qp > 0) {
+         param->qp                   = svt_enc->qp;
+         param->rate_control_mode    = 0;
+-        param->enable_adaptive_quantization = 0;
++        param->aq_mode              = 0;
+     }
+
+     desc = av_pix_fmt_desc_get(avctx->pix_fmt);
+--
+2.55.0.windows.2
+
