@@ -17,6 +17,8 @@ on:
         required: false
         default: 'https://github.com/HumanMus1c/mpv.git'
         type: string
+  repository_dispatch:
+    types: [build-mpv]
 
 concurrency:
   group: mpv-gcc-diag-${{ github.ref }}
@@ -32,6 +34,8 @@ jobs:
         bit: [x86_64_v3]
     env:
       BIT: ${{ matrix.bit }}
+      MPV_REF: ${{ github.event.client_payload.mpv_ref || github.event.inputs.mpv_ref || 'diag/demux-thread-handshake' }}
+      MPV_REPO_URL: ${{ github.event.client_payload.mpv_repo || github.event.inputs.mpv_repo || 'https://github.com/HumanMus1c/mpv.git' }}
     container:
       image: docker://ghcr.io/shinchiro/archlinux:latest
     steps:
@@ -81,7 +85,7 @@ jobs:
 
       - name: Downloading source
         run: |
-          cmake -DTARGET_ARCH=${{ env.arch }}-w64-mingw32 ${{ env.gcc_arch }} -DSINGLE_SOURCE_LOCATION=$PWD/src_packages -DRUSTUP_LOCATION=$PWD/clang_root/install_rustup -DENABLE_CCACHE=ON -DMPV_REPO=${{ github.event.inputs.mpv_repo }} -DMPV_REF=${{ github.event.inputs.mpv_ref }} --fresh -G Ninja -B build_$BIT -S $PWD
+          cmake -DTARGET_ARCH=${{ env.arch }}-w64-mingw32 ${{ env.gcc_arch }} -DSINGLE_SOURCE_LOCATION=$PWD/src_packages -DRUSTUP_LOCATION=$PWD/clang_root/install_rustup -DENABLE_CCACHE=ON -DMPV_REPO=${{ env.MPV_REPO_URL }} -DMPV_REF=${{ env.MPV_REF }} --fresh -G Ninja -B build_$BIT -S $PWD
           ninja -C build_$BIT download || true
 
       - name: Building toolchain
