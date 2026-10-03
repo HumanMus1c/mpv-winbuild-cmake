@@ -24,6 +24,7 @@ ExternalProject_Add(mpv
         libsdl2
         subrandr
         libsixel
+        curl
     GIT_REPOSITORY ${MPV_REPO}
     GIT_TAG ${MPV_REF}
     SOURCE_DIR ${SOURCE_LOCATION}

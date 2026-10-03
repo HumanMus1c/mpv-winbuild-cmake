@@ -4,9 +4,7 @@ ExternalProject_Add(curl
         c-ares
         libpsl
         libssh
-        ngtcp2
         nghttp2
-        nghttp3
         openssl
         zlib
         zstd
@@ -40,14 +38,14 @@ ExternalProject_Add(curl
         -DENABLE_UNICODE=ON
         -DENABLE_THREADED_RESOLVER=ON
         -DUSE_NGHTTP2=ON
-        -DUSE_NGHTTP3=ON
-        -DUSE_NGTCP2=ON
+        -DUSE_NGHTTP3=OFF
+        -DUSE_NGTCP2=OFF
         -DUSE_WIN32_IDN=ON
         -DUSE_WINDOWS_SSPI=ON
-        -DUSE_ECH=ON
+        -DUSE_ECH=OFF
         -DUSE_HTTPSRR=ON
         -DUSE_SSLS_EXPORT=ON
-        -DUSE_PROXY_HTTP3=ON
+        -DUSE_PROXY_HTTP3=OFF
         -DCURL_USE_PKGCONFIG=ON
         -DCMAKE_DISABLE_FIND_PACKAGE_Perl=ON
         "-DCMAKE_C_FLAGS='-DNGHTTP3_STATICLIB -DNGHTTP2_STATICLIB -DNGTCP2_STATICLIB -lz -lbrotlienc -lbrotlidec -lbrotlicommon -lzstd -lcrypt32 -lsecur32'"
