@@ -10,6 +10,7 @@ ExternalProject_Add(libplacebo
         fast_float
         xxhash
     GIT_REPOSITORY https://github.com/haasn/libplacebo.git
+    GIT_TAG bc90ef9
     SOURCE_DIR ${SOURCE_LOCATION}
     GIT_CLONE_FLAGS "--filter=tree:0"
     GIT_SUBMODULES ""
