@@ -40,6 +40,7 @@ ExternalProject_Add(mpv
         -Db_ndebug=true
         -Doptimization=3
         -Db_lto=false
+        "-Dc_link_args=['-Wl,--allow-multiple-definition']"
         -Dlibmpv=true
         -Dpdf-build=enabled
         -Dlua=enabled
