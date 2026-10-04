@@ -77,6 +77,17 @@ jobs:
           restore-keys: |
             diag-v1-clang_root
 
+      - name: Prune stamps whose source dirs are missing
+        run: |
+          for d in build_$BIT/packages/*-prefix; do
+            [[ -d "$d" ]] || continue
+            pkg=$(basename "$d"); pkg=${pkg%-prefix}
+            if [[ ! -d "src_packages/$pkg/.git" ]]; then
+              echo "pruning $pkg (no source dir)"
+              rm -rf "$d"
+            fi
+          done
+
       - name: Downloading source
         run: |
           cmake -DTARGET_ARCH=${{ env.arch }}-w64-mingw32 ${{ env.gcc_arch }} -DSINGLE_SOURCE_LOCATION=$PWD/src_packages -DRUSTUP_LOCATION=$PWD/clang_root/install_rustup -DENABLE_CCACHE=ON -DMPV_REPO=${{ env.MPV_REPO_URL }} -DMPV_REF=${{ env.MPV_REF }} --fresh -G Ninja -B build_$BIT -S $PWD
