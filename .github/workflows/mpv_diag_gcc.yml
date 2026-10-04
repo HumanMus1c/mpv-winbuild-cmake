@@ -61,18 +61,12 @@ jobs:
       - name: Loading ${{ matrix.bit }} toolchain cache
         uses: actions/cache/restore@main
         with:
-          path: build_${{ matrix.bit }}
+          path: |
+            build_${{ matrix.bit }}
+            src_packages
           key: diag-v1-gcc-${{ matrix.bit }}_toolchain-${{ github.run_id }}
           restore-keys: |
             diag-v1-gcc-${{ matrix.bit }}_toolchain
-
-      - name: Loading repository cache
-        uses: actions/cache/restore@main
-        with:
-          path: src_packages
-          key: diag-v1-repository-${{ github.run_id }}
-          restore-keys: |
-            diag-v1-repository
 
       - name: Loading rustup cache
         uses: actions/cache/restore@main
