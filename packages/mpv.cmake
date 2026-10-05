@@ -59,7 +59,6 @@ ExternalProject_Add(mpv
         -Dsixel=enabled
         ${mpv_gl}
         -Dlibcurl=enabled
-        "-Dc_args=['-Wno-error=int-conversion','-mstackrealign']"
     BUILD_COMMAND ${EXEC} LTO_JOB=1 PDB=1 ninja -C <BINARY_DIR>
     INSTALL_COMMAND ""
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
