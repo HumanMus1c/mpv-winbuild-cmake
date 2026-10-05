@@ -10,6 +10,19 @@ dlltool = '@CMAKE_INSTALL_PREFIX@/bin/@TARGET_ARCH@-dlltool'
 nasm = 'nasm'
 # exe_wrapper = 'wine'
 
+[built-in options]
+# gcc 14.4.0 cross builds emit vmovdqa (32-byte-aligned AVX stack spills) in
+# functions that never realign rsp past the Win64 16-byte guarantee. Real
+# crash series: libmpv+0x8d947, mpv.exe+0x1c69ac (run7/LTO), mpv.exe+0xe699c,
+# libmpv+0x8f9ad (run13/no-LTO), libmpv+0xe695c (run17), all 0xC0000005 with
+# the #GP sentinel Parameter[1]=-1. -mstackrealign forces the dynamic
+# realignment prologue on every function of every meson package.
+# This must live in the machine file: the EXEC wrapper's eval strips inner
+# quotes of command-line -Dc_args (run18 died on the resulting SyntaxError),
+# and a mangled command-line value also overrides this section (run16).
+c_args = ['-Wno-error=int-conversion', '-mstackrealign']
+cpp_args = ['-Wno-error=int-conversion', '-mstackrealign']
+
 [host_machine]
 system = 'windows'
 cpu_family = '@TARGET_CPU_FAMILY@'
