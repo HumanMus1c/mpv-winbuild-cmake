@@ -64,9 +64,9 @@ jobs:
           path: |
             build_${{ matrix.bit }}
             src_packages
-          key: diag-v1-gcc-${{ matrix.bit }}_toolchain-${{ github.run_id }}
+          key: diag-v2-gcc-${{ matrix.bit }}_toolchain-${{ github.run_id }}
           restore-keys: |
-            diag-v1-gcc-${{ matrix.bit }}_toolchain
+            diag-v2-gcc-${{ matrix.bit }}_toolchain
 
       - name: Loading rustup cache
         uses: actions/cache/restore@main
@@ -144,4 +144,4 @@ jobs:
         if: always()
         with:
           path: build_${{ matrix.bit }}
-          key: diag-v1-gcc-${{ matrix.bit }}_toolchain-${{ github.run_id }}
+          key: diag-v2-gcc-${{ matrix.bit }}_toolchain-${{ github.run_id }}

@@ -10,17 +10,6 @@ dlltool = '@CMAKE_INSTALL_PREFIX@/bin/@TARGET_ARCH@-dlltool'
 nasm = 'nasm'
 # exe_wrapper = 'wine'
 
-[built-in options]
-# gcc 14.4.0 cross builds emit vmovdqa (32-byte-aligned AVX stack spills) for
-# functions that never realign rsp past the Win64 16-byte guarantee; whether a
-# given call chain hits the unaligned path depends on inlining and frame
-# layout. Real-observed crash series: libmpv+0x8d947, mpv.exe+0x1c69ac
-# (run7/LTO), mpv.exe+0xe699c, libmpv+0x8f9ad (run13/no-LTO), all 0xC0000005.
-# -mstackrealign forces the dynamic-realignment prologue on every function of
-# every meson package so the spills are safe regardless of layout.
-c_args = ['-Wno-error=int-conversion', '-mstackrealign']
-cpp_args = ['-Wno-error=int-conversion', '-mstackrealign']
-
 [host_machine]
 system = 'windows'
 cpu_family = '@TARGET_CPU_FAMILY@'
