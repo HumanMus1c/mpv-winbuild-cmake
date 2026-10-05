@@ -111,7 +111,7 @@ jobs:
             G="$BIN/$compiler"
             [[ -f "$G" ]] || { echo "skip $compiler (not found)"; continue; }
             if [[ ! -f "$G.real" ]]; then mv "$G" "$G.real"; fi
-            printf '#!/bin/bash\nexec %s.real -mstackrealign "$@"\n' "$PWD/$G.real" > "$G"
+            printf '#!/bin/bash\nexec %s -mstackrealign "$@"\n' "$PWD/$G.real" > "$G"
             chmod +x "$G"
           done
           echo "--- wrapper sanity check ---"
