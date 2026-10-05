@@ -97,6 +97,26 @@ jobs:
         run: |
           if [[ ! -f "build_$BIT/install/bin/cross-gcc" ]]; then ninja -C build_$BIT gcc && rm -rf build_$BIT/toolchain; fi
 
+      - name: Install realign gcc wrapper
+        run: |
+          # gcc 14.4.0 cross emits vmovdqa (32-byte-aligned AVX stack spills) in
+          # functions that never realign rsp past the Win64 16-byte guarantee:
+          # the observed 0xC0000005 crash series all die on vmovdqa with the #GP
+          # sentinel Parameter[1]=-1. Injecting -mstackrealign through meson
+          # (-Dc_args, reconfigure, cross-file [built-in options]) silently
+          # failed for reasons that differ between local and CI environments;
+          # wrapping the compiler is physical and build-system-agnostic.
+          BIN="build_$BIT/install/bin"
+          for compiler in x86_64-w64-mingw32-gcc x86_64-w64-mingw32-g++; do
+            G="$BIN/$compiler"
+            [[ -f "$G" ]] || { echo "skip $compiler (not found)"; continue; }
+            if [[ ! -f "$G.real" ]]; then mv "$G" "$G.real"; fi
+            printf '#!/bin/bash\nexec %s.real -mstackrealign "$@"\n' "$PWD/$G.real" > "$G"
+            chmod +x "$G"
+          done
+          echo "--- wrapper sanity check ---"
+          "$BIN/x86_64-w64-mingw32-gcc" --version | head -1
+
       - name: Building mpv
         run: |
           ninja -C build_$BIT update
