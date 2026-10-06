@@ -1,4 +1,5 @@
 ExternalProject_Add(gcc-binutils
+    URL https://mirrors.kernel.org/gnu/binutils/binutils-2.45.1.tar.xz
     URL https://ftp.gnu.org/gnu/binutils/binutils-2.45.1.tar.xz
     URL_HASH SHA512=ea030419eba387579ab717be7e3223fc99e93b586860b06003c12489f93441640d4082736f76aa5e98233db4f46e232f536a45e471486de1f5b64e1b827c167e
     DOWNLOAD_DIR ${SOURCE_LOCATION}
