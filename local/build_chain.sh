@@ -10,6 +10,9 @@ if ! meson --version 2>/dev/null | grep -q "1.12"; then
   hash -r
 fi
 export CMAKE_POLICY_VERSION_MINIMUM=3.5
+# 内存防线(2026-10-11): 8GB 内存扛不住 -j12 的 gcc 自举 host 工具
+# (genautomata 等每个 1-3GB, OOM Killed 实测)——并行度降到 4。
+export MAKEJOBS=4
 
 # 0) configure(CI workflow 同款参数)
 if [[ ! -f build_x86_64_v3/CMakeCache.txt ]]; then
