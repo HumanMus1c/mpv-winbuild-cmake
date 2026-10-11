@@ -119,6 +119,7 @@ jobs:
 
       - name: Building mpv
         run: |
+          export MOE_KEEP_SYMBOLS=1
           ninja -C build_$BIT update
           ninja -C build_$BIT mpv
 

@@ -64,11 +64,15 @@ ExternalProject_Add(mpv
     LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1
 )
 
+if(NOT DEFINED ENV{MOE_KEEP_SYMBOLS})
 ExternalProject_Add_Step(mpv strip-binary
     DEPENDEES build
     ${mpv_add_debuglink}
     COMMENT "Stripping mpv binaries"
 )
+else()
+    message(STATUS "MOE_KEEP_SYMBOLS set - keeping debug symbols in mpv binaries")
+endif()
 
 ExternalProject_Add_Step(mpv copy-binary
     DEPENDEES strip-binary
