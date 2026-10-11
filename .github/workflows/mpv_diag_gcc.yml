@@ -64,9 +64,9 @@ jobs:
           path: |
             build_${{ matrix.bit }}
             src_packages
-          key: diag-v4-gcc-${{ matrix.bit }}_toolchain-${{ github.run_id }}
+          key: diag-v5-gcc-${{ matrix.bit }}_toolchain-${{ github.run_id }}
           restore-keys: |
-            diag-v4-gcc-${{ matrix.bit }}_toolchain
+            diag-v5-gcc-${{ matrix.bit }}_toolchain
 
       - name: Loading rustup cache
         uses: actions/cache/restore@main
@@ -119,7 +119,6 @@ jobs:
 
       - name: Building mpv
         run: |
-          export MOE_KEEP_SYMBOLS=1
           ninja -C build_$BIT update
           ninja -C build_$BIT mpv
 
@@ -165,4 +164,4 @@ jobs:
         if: always()
         with:
           path: build_${{ matrix.bit }}
-          key: diag-v4-gcc-${{ matrix.bit }}_toolchain-${{ github.run_id }}
+          key: diag-v5-gcc-${{ matrix.bit }}_toolchain-${{ github.run_id }}
